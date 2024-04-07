@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Monfo File Uploads</title>
+  </head>
+  <body>
+    <div>
+      <h1>File Upload</h1>
+      <form action="/cahierCharge/upload" method="post" enctype="multipart/form-data">
+        <div>
+          <input name="file" type="file" id="file" />
+          <input name="title" type="text" id="title" placeholder="title"/>
+          <input name="source" type="text" id="source"  placeholder="source"/>
+          <input name="description" type="text" id="description"  placeholder="desc"/>
+        </div>
+        <div>
+          <input name="submit" value="submit" type="submit" id="submit" />
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
