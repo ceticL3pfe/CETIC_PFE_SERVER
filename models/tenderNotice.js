@@ -14,6 +14,14 @@ const TenderNoticeSchema = new Schema(
         description: {
             type: String,
         },
+        missionHead:{
+            type:String
+        },
+        status:{
+            type: String,
+            default: "Pending",
+            enum: ["Pending", "Open", "Closed", "Cancelled"] 
+        }
      
     },
     { timestamps: true }
@@ -27,7 +35,7 @@ const TenderNotice = model("tenderNotice", TenderNoticeSchema);
 
 //intreractions with DB
 
-const addNewTenderNotice = async (source, title, description=null) => {
+const addNewTenderNotice = async (source, title, description=null,missionHead=null,status=null) => {
     if (!source || !title) {
         return false
     }
@@ -35,13 +43,15 @@ const addNewTenderNotice = async (source, title, description=null) => {
     const newTenderNotice = new TenderNotice({
         source,
         title,
-        description
+        description,
+        missionHead,
+        status
     })
 
 
-    const res = await newTenderNotice.save().then(() => {
+    const res = await newTenderNotice.save().then((res) => {
         console.log("added successfully")
-        return true
+        return res
     }).catch(err => {
         console.log("error while adding tender notice to db", err)
         return false
@@ -50,22 +60,26 @@ const addNewTenderNotice = async (source, title, description=null) => {
     return res
 }
 const updateTenderNoticeData = async (tenderId, updateData) => {
+    try {
+        const updatedTender = await TenderNotice.findOneAndUpdate(
+            { _id: tenderId },
+            updateData,
+            { new: true } // Return the modified document
+        );
 
-    const res = await TenderNotice.updateOne({_id:tenderId}, updateData, { new: true }).then(res => {
-        if (res) {
-            console.log('updated successfully')
-return res
+        if (updatedTender) {
+            console.log('Updated successfully:', updatedTender);
+            return updatedTender;
         } else {
-            console.log('update failed')
-
-            return false
+            console.log('No document updated');
+            return null;
         }
-    }).catch(err => {
-        console.log('update failed', err)
-        return false
-    })
-    return res
-}
+    } catch (err) {
+        console.error('Update failed:', err);
+        return null;
+    }
+};
+
 const removeTenderNotice = async (tenderId) => {
     console.log("asdasdasdas")
 

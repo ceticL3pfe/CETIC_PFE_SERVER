@@ -16,6 +16,7 @@ mongoose.connection.on("open", () => {
     const storage = multer.diskStorage({
 
         filename: function (req, file, cb) {
+            console.log("milter",req.body)
             cb(null, file.originalname); // Use the original file name for the uploaded file
         }
     });
@@ -31,7 +32,7 @@ mongoose.connection.on("open", () => {
         .get('/', (req, res) => getCahierCharges(req, res, bucket))
         .get("/cahier-charge-data/:id", (req, res) => getCahierCharge(req, res, bucket))
         .delete('/:id/:documentId', (req, res) => deleteCahierCharge(req, res, bucket))
-        .post('/upload', upload.single('file'), (req, res) => addCahierCharge(req, res, bucket))
+        .post('/', upload.single('file'), (req, res) => addCahierCharge(req, res, bucket))
         .put('/:id', (req, res) => updateCahierCharge(req, res, bucket))
 
 

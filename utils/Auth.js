@@ -1,8 +1,13 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
-const User = require("../models/User");
+const { User } = require("../models/User");
 const { SECRET } = require("../config");
+const { Admin } = require("../models/admin");
+const { AgentTc } = require("../models/agentTc");
+const { ControlleurDeGestion } = require("../models/controlleurDeGestion");
+const { Directeur } = require("../models/directeur");
+const { Commission } = require("../models/commission");
 
 /**
  * @DESC To register the user (ADMIN, SUPER_ADMIN, USER)
@@ -36,14 +41,50 @@ const userRegister = async (userDets, role, res) => {
       role
     });
 
-    await newUser.save();
+    const response = await newUser.save();
+
+    switch (role) {
+      case "admin":
+        const admin = new Admin({
+          matricule: response._id
+        });
+        await admin.save()
+        break
+      case "stc":
+        const tc = new AgentTc({
+          matricule: response._id
+        });
+        await tc.save()
+        break
+      case "controlleurDeGestion":
+        const controlleurGestion = new ControlleurDeGestion({
+          matricule: response._id
+        });
+        await controlleurGestion.save()
+        break
+      case "directeur":
+        const directeur = new Directeur({
+          matricule: response._id
+        });
+        await directeur.save()
+        break
+      case "commission":
+        const commission = new Commission({
+          matricule: response._id
+        });
+        await commission.save()
+        break
+
+
+    }
+
     return res.status(201).json({
       message: "Hurry! now you are successfully registred. Please nor login.",
       success: true
     });
   } catch (err) {
     // Implement logger function (winston)
-    
+console.log(err)
     return res.status(500).json({
       message: `Unable to create your account.,${err}`,
       success: false
@@ -55,22 +96,22 @@ const userRegister = async (userDets, role, res) => {
  * @DESC To Login the user (ADMIN, SUPER_ADMIN, USER)
  */
 const userLogin = async (userCreds, role, res) => {
-  let { username, password } = userCreds;
+  let { email, password } = userCreds;
   // First Check if the username is in the database
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ email });
   if (!user) {
     return res.status(404).json({
-      message: "Username is not found. Invalid login credentials.",
+      message: "email is not found. Invalid login credentials.",
       success: false
     });
   }
   // We will check the role
-  if (user.role !== role) {
-    return res.status(403).json({
-      message: "Please make sure you are logging in from the right portal.",
-      success: false
-    });
-  }
+  // if (user.role !== role) {
+  //   return res.status(403).json({
+  //     message: "Please make sure you are logging in from the right portal.",
+  //     success: false
+  //   });
+  // }
   // That means user is existing and trying to signin fro the right portal
   // Now check for the password
   let isMatch = await bcrypt.compare(password, user.password);
@@ -88,11 +129,15 @@ const userLogin = async (userCreds, role, res) => {
     );
 
     let result = {
-      username: user.username,
-      role: user.role,
-      email: user.email,
+      user:
+      {
+        _id: user._id,
+        username: user.username,
+        role: user.role,
+        email: user.email,
+        expiresIn: 168
+      },
       token: `Bearer ${token}`,
-      expiresIn: 168
     };
 
     return res.status(200).json({

@@ -9,7 +9,7 @@ const { addNewTenderNotice, removeTenderNotice, updateTenderNoticeData, getTende
 
 const addTenderNotice = async (req, res) => {
     try {
-        const { source, title } = req.body;
+        const { source, title,description,status,missionHead } = req.body;
 
         if (!title || !source) {
             return res.status(401).json({ success: false, msg: "all fields are required" });
@@ -20,11 +20,11 @@ const addTenderNotice = async (req, res) => {
 
      
 
-            const response = await addNewTenderNotice(source, title);
+            const response = await addNewTenderNotice(source, title,description,missionHead,status);
             if (!response) {
                 return res.status(500).json({ success: false, msg: "failed to add to db" });
             }
-            return res.status(200).json({ success: true, msg: "tender notice added successfully" });
+            return res.status(200).json({ success: true, msg: response});
 
     } catch (error) {
         console.error("Error:", error.message);
@@ -34,7 +34,6 @@ const addTenderNotice = async (req, res) => {
 
 const deleteTenderNotice = async (req, res) => {
     const { id } = req.params; // Assuming the file ID is passed in the request parameters
-
     try {
         // Check if id is a valid ObjectId
         if ( !ObjectId.isValid(id)) {
@@ -55,8 +54,8 @@ const deleteTenderNotice = async (req, res) => {
 };
 const updateTenderNotice = async (req, res) => {
     const { id } = req.params;
-    const { title, source } = req.body; 
-
+    const { title, source,description,missionHead,status } = req.body; 
+    console.log(id, title, source)
     try {
         if (!ObjectId.isValid(id)) {
             return res.status(400).json({ success: false, msg: "Invalid file ID" });
@@ -64,14 +63,24 @@ const updateTenderNotice = async (req, res) => {
 
        
         const updateObject = {};
+
         if (title) {
             updateObject["title"] = title;
         }
         if (source) {
             updateObject["source"] = source;
         }
+        if (description) {
+            updateObject["description"] = description;
+        }
+        if (missionHead) {
+            updateObject["missionHead"] = missionHead;
+        }
+        if (status) {
+            updateObject["status"] = status;
+        }
         
-        if (!title&& !source){
+        if (!title&& !source&&!description&&!missionHead&&!status){
             return res.status(400).json({ success: false, msg: "required fields" });
 
         }
@@ -81,8 +90,8 @@ const updateTenderNotice = async (req, res) => {
         
         console.log(result)
     
-        if (result?.nModified === 1) {
-            return res.status(200).json({ success: true, msg: "Metadata updated successfully" });
+        if (result) {
+            return res.status(200).json({ success: true, msg: result });
         } else {
             return res.status(500).json({ success: false, msg: "Failed to update metadata" });
         }

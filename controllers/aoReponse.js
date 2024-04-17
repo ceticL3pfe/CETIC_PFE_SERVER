@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { addNewCahierCharge, removeCahierCharge, updateCahierChargeData, getCahierChargeData } = require("../models/CahierCharge");
+const { addNewAoReponse, removeAoReponse, updateAoReponseData, getAoReponseData } = require("../models/aoReponse");
 const fileSystem = require('fs')
 
 
@@ -8,13 +8,12 @@ const fileSystem = require('fs')
 
 
 
-const addCahierCharge = async (req, res, bucket) => {
+const addAoReponse = async (req, res, bucket) => {
     try {
         const file = req.file;
-        const { name, description, deadLine, client } = req.body;
+        const { title } = req.body;
 
-        if (!file || !name || !description || !deadLine || !client) {
-            console.log(req.body)
+        if (!file || !title) {
             return res.status(401).json({ success: false, msg: "all fields are required" });
         }
 
@@ -40,11 +39,11 @@ const addCahierCharge = async (req, res, bucket) => {
             // Assuming you're using AWS SDK to interact with S3
             const fileId = uploadStream.id; // This line may vary depending on your storage service
             console.log("fileID", uploadStream.id, fileId)
-            const response = await addNewCahierCharge(name, description, deadLine, client, fileId);
+            const response = await addNewAoReponse(title, fileId);
             if (!response) {
                 return res.status(500).json({ success: false, msg: "failed to add to db" });
             }
-            return res.status(200).json({ success: true, msg: "tender notice added successfully" });
+            return res.status(200).json({ success: true, msg: "ao reponse added successfully" });
         });
 
         // This line reads the file and pipes it to the upload stream
@@ -55,7 +54,7 @@ const addCahierCharge = async (req, res, bucket) => {
     }
 }
 
-const deleteCahierCharge = async (req, res, bucket) => {
+const deleteAoReponse = async (req, res, bucket) => {
     const { id, documentId } = req.params; // Assuming the file ID is passed in the request parameters
 
     try {
@@ -76,7 +75,7 @@ const deleteCahierCharge = async (req, res, bucket) => {
         await bucket.delete(new ObjectId(id));
 
 
-        const response = await removeCahierCharge(documentId);
+        const response = await removeAoReponse(documentId);
 
         if (!response || response.nModified === 0) {
             return res.status(404).json({ success: false, msg: "File not deleted" });
@@ -88,7 +87,7 @@ const deleteCahierCharge = async (req, res, bucket) => {
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 };
-const updateCahierCharge = async (req, res, bucket) => {
+const updateAoReponse = async (req, res, bucket) => {
     const { id } = req.params;
     const { title } = req.body;
 
@@ -108,7 +107,7 @@ const updateCahierCharge = async (req, res, bucket) => {
         }
 
         // Update the metadata of the file
-        const result = await updateCahierChargeData(id, updateObject)
+        const result = await updateAoReponseData(id, updateObject)
 
         console.log(result)
 
@@ -124,10 +123,10 @@ const updateCahierCharge = async (req, res, bucket) => {
 };
 
 
-const getCahierCharges = async (req, res) => {
+const getAoReponses = async (req, res) => {
     try {
 
-        const response = await getCahierChargeData();
+        const response = await getAoReponseData();
         if (!response) {
             return res.status(500).json({ success: false, msg: "Failed to retrieve data" })
         }
@@ -142,7 +141,7 @@ const getCahierCharges = async (req, res) => {
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 };
-const getCahierCharge = async (req, res, bucket) => {
+const getAoReponse = async (req, res, bucket) => {
     try {
         const fileId = req.params.id;
 
@@ -164,10 +163,10 @@ const getCahierCharge = async (req, res, bucket) => {
     }
 };
 module.exports = {
-    addCahierCharge,
-    deleteCahierCharge,
-    updateCahierCharge,
-    getCahierCharge,
-    getCahierCharges
+    addAoReponse,
+    deleteAoReponse,
+    updateAoReponse,
+    getAoReponse,
+    getAoReponses
 
 }

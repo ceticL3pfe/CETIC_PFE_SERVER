@@ -1,23 +1,13 @@
 const { Schema, model } = require("mongoose");
 
-const cahierChargeSchema = new Schema(
+const aoReponseSchema = new Schema(
     {
 
         fileId: {
             type: String,
             required: true
         },
-
-        name: {
-            type: String,
-            required: true
-        }, description: {
-            type: String,
-            required: true
-        }, deadLine: {
-            type: String,
-            required: true
-        }, client: {
+        title: {
             type: String,
             required: true
         },
@@ -25,35 +15,35 @@ const cahierChargeSchema = new Schema(
     },
     { timestamps: true }
 );
-const CahierCharge = model("cahierCharge", cahierChargeSchema);
+const AoReponse = model("aoReponse", aoReponseSchema);
 
 
 //intreractions with DB
 
-const addNewCahierCharge = async (name, description, deadLine, client, fileId) => {
-    if (!fileId || !name) {
+const addNewAoReponse = async (title, fileId) => {
+    if (!fileId || !title) {
         return false
     }
 
-    const newCahierCharge = new CahierCharge({
+    const newAoReponse = new AoReponse({
         fileId,
-        name, description, deadLine, client
+        title,
     })
 
 
-    const res = await newCahierCharge.save().then(() => {
+    const res = await newAoReponse.save().then(() => {
         console.log("added successfully")
         return true
     }).catch(err => {
-        console.log("error while adding newCahierCharge  to db", err)
+        console.log("error while adding newaoReponse  to db", err)
         return false
     })
 
     return res
 }
-const updateCahierChargeData = async (id, updateData) => {
+const updateAoReponseData = async (id, updateData) => {
 
-    const res = await CahierCharge.updateOne({ _id: id }, updateData).then(res => {
+    const res = await AoReponse.updateOne({ _id: id }, updateData).then(res => {
         if (res) {
             console.log('updated successfully', res)
             return res
@@ -68,8 +58,8 @@ const updateCahierChargeData = async (id, updateData) => {
     })
     return res
 }
-const removeCahierCharge = async (id) => {
-    const res = await CahierCharge.findByIdAndDelete(id)
+const removeAoReponse = async (id) => {
+    const res = await AoReponse.findByIdAndDelete(id)
         .then(deletedDocument => {
             if (deletedDocument) {
                 // Document was found and deleted successfully
@@ -95,8 +85,8 @@ const removeCahierCharge = async (id) => {
 
 }
 
-const getCahierChargeData = async () => {
-    const res = await CahierCharge.find()
+const getAoReponseData = async () => {
+    const res = await AoReponse.find()
         .then(res => {
             if (res) {
                 return res
@@ -125,12 +115,6 @@ const getCahierChargeData = async () => {
 }
 
 
-const serializeCahierCharge = (data) => {
-    return {
-        title: data.title,
-        fileData: data.fileData,
-    }
-}
 
 
 
@@ -139,9 +123,9 @@ const serializeCahierCharge = (data) => {
 
 
 module.exports = {
-    CahierCharge,
-    addNewCahierCharge,
-    removeCahierCharge,
-    updateCahierChargeData,
-    getCahierChargeData
+    AoReponse,
+    addNewAoReponse,
+    removeAoReponse,
+    updateAoReponseData,
+    getAoReponseData
 }

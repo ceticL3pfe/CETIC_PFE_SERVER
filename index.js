@@ -2,8 +2,9 @@ const cors = require("cors");
 const exp = require("express");
 const bp = require("body-parser");
 const passport = require("passport");
-const {  PORT } = require("./config/index");
-const mongoose = require('mongoose')
+const { PORT } = require("./config/index");
+const mongoose = require('mongoose');
+const { userAuth,checkRole } = require("./utils/Auth");
 // Initialize the application
 const app = exp();
 
@@ -17,11 +18,14 @@ require("./middlewares/passport")(passport);
 
 // routes
 
-app.use("/api/users", require("./routes/users"));
+app.use("/user", require("./routes/users"));
+app.use("/admin", require('./routes/admin'))
 app.use("/tenderNotice", require("./routes/tenderNotice"));
-app.use("/cahierCharge", require("./routes/cahierCharge"));
+app.use("/cdc", require("./routes/cahierCharge"));
+app.use("/aoReponse", require("./routes/aoReponse"));
+app.use("/clientPv", require("./routes/clientPv"));
 
-app.use("/", (req, res) => res.render('index'))
+app.use("/*", (req, res) => res.render('index'))
 
 
 
@@ -38,7 +42,7 @@ conn.once('open', function () {
 });
 
 
-  
+
 
 
 
