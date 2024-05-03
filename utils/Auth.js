@@ -8,7 +8,6 @@ const { AgentTc } = require("../models/agentTc");
 const { ControlleurDeGestion } = require("../models/controlleurDeGestion");
 const { Directeur } = require("../models/directeur");
 const { Commission } = require("../models/commission");
-
 /**
  * @DESC To register the user (ADMIN, SUPER_ADMIN, USER)
  */
@@ -137,7 +136,7 @@ const userLogin = async (userCreds, role, res) => {
         email: user.email,
         expiresIn: 168
       },
-      token: `Bearer ${token}`,
+      token: `${token}`,
     };
 
     return res.status(200).json({
@@ -162,7 +161,13 @@ const validateUsername = async username => {
  * @DESC Passport middleware
  */
 const userAuth = passport.authenticate("jwt", { session: false });
-
+const useProtect = (req,res,next)=>{
+  const token = req.params.token
+  console.log(token)
+  const rep =jwt.verify(token,SECRET)
+  console.log(rep)
+  if(rep){next()}else{res.status(401).json({success:false,msg:"you are not authaurized"})}
+}
 /**
  * @DESC Check Role Middleware
  */
@@ -189,6 +194,7 @@ const serializeUser = user => {
 
 module.exports = {
   userAuth,
+  useProtect,
   checkRole,
   userLogin,
   userRegister,

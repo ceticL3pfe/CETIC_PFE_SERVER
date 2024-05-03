@@ -7,7 +7,8 @@ const { getAoReponse,
     updateAoReponse,
     getAoReponses } = require('../controllers/aoReponse')
 const mongoose = require("mongoose");
-const multer = require('multer')
+const multer = require('multer');
+const { useProtect } = require('../utils/Auth');
 let bucket
 mongoose.connection.on("open", () => {
     bucket = database.bucket;
@@ -28,11 +29,11 @@ mongoose.connection.on("open", () => {
 
 
     router
-        .get('/', (req, res) => getAoReponses(req, res, bucket))
-        .get("/ao-response-data/:id", (req, res) => getAoReponse(req, res, bucket))
-        .delete('/:id/:documentId', (req, res) => deleteAoReponse(req, res, bucket))
-        .post('/upload', upload.single('file'), (req, res) => addAoReponse(req, res, bucket))
-        .put('/:id', (req, res) => updateAoReponse(req, res, bucket))
+        // .get('/', (req, res) => getAoReponses(req, res, bucket))
+        .get("/ao-response-data/:id/:token", useProtect, (req, res) => getAoReponse(req, res, bucket))
+        .delete('/:documentId/:id', (req, res) => deleteAoReponse(req, res, bucket))
+        .post('/:tenderId', upload.single('file'), (req, res) => addAoReponse(req, res, bucket))
+        // .put('/:id', (req, res) => updateAoReponse(req, res, bucket))
 
 
 

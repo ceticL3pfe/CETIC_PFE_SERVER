@@ -21,6 +21,13 @@ const cahierChargeSchema = new Schema(
             type: String,
             required: true
         },
+        
+        commissionComment:[ {
+            type: String,
+        }],
+        controlleurComment:[ {
+            type: String,
+        }]
 
     },
     { timestamps: true }
@@ -31,13 +38,12 @@ const CahierCharge = model("cahierCharge", cahierChargeSchema);
 //intreractions with DB
 
 const addNewCahierCharge = async (name, description, deadLine, client, fileId) => {
-    if (!fileId || !name) {
+    if (!fileId ) {
         return false
     }
 
     const newCahierCharge = new CahierCharge({
         fileId,
-        name, description, deadLine, client
     })
 
 
@@ -51,11 +57,14 @@ const addNewCahierCharge = async (name, description, deadLine, client, fileId) =
 
     return res
 }
+
+
 const updateCahierChargeData = async (id, updateData) => {
+    console.log(id,updateData)
 
     const res = await CahierCharge.updateOne({ _id: id }, updateData).then(res => {
         if (res) {
-            console.log('updated successfully', res)
+            // console.log('updated successfully', res)
             return res
         } else {
             console.log('update failed')
@@ -123,6 +132,7 @@ const getCahierChargeData = async () => {
 
 
 }
+
 
 
 const serializeCahierCharge = (data) => {

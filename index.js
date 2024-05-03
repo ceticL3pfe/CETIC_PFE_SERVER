@@ -21,9 +21,11 @@ require("./middlewares/passport")(passport);
 app.use("/user", require("./routes/users"));
 app.use("/admin", require('./routes/admin'))
 app.use("/tenderNotice", require("./routes/tenderNotice"));
+app.use("/client", require("./routes/client"));
+app.use("/fournisseur", require("./routes/fournisseur"));
 app.use("/cdc", require("./routes/cahierCharge"));
 app.use("/aoReponse", require("./routes/aoReponse"));
-app.use("/clientPv", require("./routes/clientPv"));
+app.use("/pvClient", require("./routes/clientPv"));
 
 app.use("/*", (req, res) => res.render('index'))
 

@@ -1,6 +1,8 @@
 const { ObjectId } = require("mongodb");
-const { addNewAoReponse, removeAoReponse, updateAoReponseData, getAoReponseData } = require("../models/aoReponse");
-const fileSystem = require('fs')
+const { addNewAoReponse, removeAoReponse, updateAoReponseData, getAoReponseData, AoReponse } = require("../models/aoReponse");
+const fileSystem = require('fs');
+const { updateTenderNoticeData } = require("../models/tenderNotice");
+
 
 
 
@@ -10,10 +12,12 @@ const fileSystem = require('fs')
 
 const addAoReponse = async (req, res, bucket) => {
     try {
+        console.log(req.file)
         const file = req.file;
-        const { title } = req.body;
+        const tenderId = req.params.tenderId
 
-        if (!file || !title) {
+        if (!file || !tenderId) {
+            console.log(req.body)
             return res.status(401).json({ success: false, msg: "all fields are required" });
         }
 
@@ -39,11 +43,11 @@ const addAoReponse = async (req, res, bucket) => {
             // Assuming you're using AWS SDK to interact with S3
             const fileId = uploadStream.id; // This line may vary depending on your storage service
             console.log("fileID", uploadStream.id, fileId)
-            const response = await addNewAoReponse(title, fileId);
+            const response = await updateTenderNoticeData(tenderId, { aoResponse: fileId });
             if (!response) {
                 return res.status(500).json({ success: false, msg: "failed to add to db" });
             }
-            return res.status(200).json({ success: true, msg: "ao reponse added successfully" });
+            return res.status(200).json({ success: true, msg: response });
         });
 
         // This line reads the file and pipes it to the upload stream
@@ -60,6 +64,7 @@ const deleteAoReponse = async (req, res, bucket) => {
     try {
         // Check if id is a valid ObjectId
         if (!ObjectId.isValid(id) || !ObjectId.isValid(documentId)) {
+            console.log(req.params)
             return res.status(400).json({ success: false, msg: "Invalid file ID or documentId" });
         }
 
@@ -75,9 +80,9 @@ const deleteAoReponse = async (req, res, bucket) => {
         await bucket.delete(new ObjectId(id));
 
 
-        const response = await removeAoReponse(documentId);
-
-        if (!response || response.nModified === 0) {
+        const response = await updateTenderNoticeData(documentId, { aoResponse: null });
+console.log(response)
+        if (!response || !response.isModified) {
             return res.status(404).json({ success: false, msg: "File not deleted" });
 
         }

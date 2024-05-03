@@ -7,22 +7,82 @@ const TenderNoticeSchema = new Schema(
             type: String,
             required: true
         },
-        title: {
+        object: {
             type: String,
             required: true
         },
         description: {
             type: String,
         },
-        missionHead:{
-            type:String
+        missionHead: {
+            type: String
         },
-        status:{
+        status: {
             type: String,
             default: "Pending",
-            enum: ["Pending", "Open", "Closed", "Cancelled"] 
-        }
-     
+            enum: ["Pending", "analyse de la commission", "validation retrait cdc",
+                "validation dossier de reponse", "Open", "Closed", "Cancelled"]
+        },
+        aoResponse: {
+            type: String,
+
+        },
+        cahierCharge: {
+            type: String
+        },
+        pvClient: {
+            type: String,
+        },
+        commissionComments: [{
+            type: String,
+        }],
+        controlleurDeGestionComments: [{
+            type: String,
+        }],
+        directeurComments: [{
+            type: String,
+        }],
+        commissionResponse: {
+            type: String
+        },
+        controlleurDeGestionResponse: {
+            type: String
+        },
+        fournisseur_1: {
+            type: String
+        },
+
+        prix_fournisseur_1: {
+            type: Number
+        },
+        durée_fournisseur_1: {
+            type: Number
+        },
+
+        fournisseur_2: {
+            type: String
+        },
+
+        prix_fournisseur_2: {
+            type: Number
+        },
+        durée_fournisseur_2: {
+            type: Number
+        },
+        
+        fournisseur_3: {
+            type: String
+        },
+
+        prix_fournisseur_3: {
+            type: Number
+        },
+        durée_fournisseur_3: {
+            type: Number
+        },
+
+
+
     },
     { timestamps: true }
 );
@@ -35,17 +95,28 @@ const TenderNotice = model("tenderNotice", TenderNoticeSchema);
 
 //intreractions with DB
 
-const addNewTenderNotice = async (source, title, description=null,missionHead=null,status=null) => {
-    if (!source || !title) {
+const addNewTenderNotice = async (source, object, description = null,
+    missionHead = null, status = null, aoResponse = null, pvClient = null, cahierCharge = null,
+    fournisseur_1 = null, prix_fournisseur_1 = null, durée_fournisseur_1 = null,
+    fournisseur_2 = null, prix_fournisseur_2 = null, durée_fournisseur_2 = null,
+    fournisseur_3 = null, prix_fournisseur_3 = null, durée_fournisseur_3 = null,
+) => {
+    if (!source || !object) {
         return false
     }
 
     const newTenderNotice = new TenderNotice({
         source,
-        title,
+        object,
         description,
         missionHead,
-        status
+        status,
+        aoResponse
+        , pvClient,
+        cahierCharge,
+        fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
+        fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
+        fournisseur_3, prix_fournisseur_3, durée_fournisseur_3,
     })
 
 
@@ -59,6 +130,7 @@ const addNewTenderNotice = async (source, title, description=null,missionHead=nu
 
     return res
 }
+
 const updateTenderNoticeData = async (tenderId, updateData) => {
     try {
         const updatedTender = await TenderNotice.findOneAndUpdate(
@@ -108,8 +180,8 @@ const removeTenderNotice = async (tenderId) => {
 
 }
 
-const getTenderNoticeData = async() => {
- const res =   await TenderNotice.find()
+const getTenderNoticeData = async () => {
+    const res = await TenderNotice.find()
         .then(res => {
             if (res) {
                 return res
@@ -128,21 +200,44 @@ const getTenderNoticeData = async() => {
         });
 
 
-        if(res){
-          return res;
-        }
-        return false
+    if (res) {
+        return res;
+    }
+    return false
 
 
 
 }
 
+const getTenderNoticeArchive = async () => {
+    const res = await TenderNotice.find({
+        status: { $nin: ["Cancelled", "Closed"] }
+    })
+        .then(res => {
+            if (res) {
+                return res;
+            } else {
+                console.log("Document not found");
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error("Error retrieving tender notices:", error);
+            return false;
+        });
+
+    if (res) {
+        return res;
+    }
+    return false;
+}
+
 
 const serializeTenderNotice = (data) => {
     return {
-        source:data.source,
-        title:data.title,
-        description:(data.description) ?? "EMPTY"
+        source: data.source,
+        title: data.title,
+        description: (data.description) ?? "EMPTY"
     }
 }
 
@@ -157,5 +252,6 @@ module.exports = {
     addNewTenderNotice,
     removeTenderNotice,
     updateTenderNoticeData,
-    getTenderNoticeData
+    getTenderNoticeData,
+    getTenderNoticeArchive,
 }
