@@ -9,11 +9,11 @@ const { addNewTenderNotice, removeTenderNotice, updateTenderNoticeData, getTende
 
 const addTenderNotice = async (req, res) => {
     try {
-        const { source, object, description, status, missionHead, fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
+        const {userId, source, object, description, status, missionHead, fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
             fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
             fournisseur_3, prix_fournisseur_3, durée_fournisseur_3, } = req.body;
 
-        if (!object || !source) {
+        if (!object || !source || !userId) {
             return res.status(401).json({ success: false, msg: "all fields are required" });
         }
 
@@ -22,10 +22,10 @@ const addTenderNotice = async (req, res) => {
 
 
 
-        const response = await addNewTenderNotice(source, object, description, missionHead, status,
+        const response = await addNewTenderNotice(source, object,userId ,description, missionHead, status,
             fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
             fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
-            fournisseur_3, prix_fournisseur_3, durée_fournisseur_3
+            fournisseur_3, prix_fournisseur_3, durée_fournisseur_3, 
         );
         if (!response) {
             return res.status(500).json({ success: false, msg: "failed to add to db" });

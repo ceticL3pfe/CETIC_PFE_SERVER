@@ -2,7 +2,10 @@ const { Schema, model } = require("mongoose");
 
 const TenderNoticeSchema = new Schema(
     {
-
+        userId: {
+            type: String,
+            require: true
+        },
         source: {
             type: String,
             required: true
@@ -48,6 +51,11 @@ const TenderNoticeSchema = new Schema(
         controlleurDeGestionResponse: {
             type: String
         },
+        
+        directeurResponse: {
+            type: String
+        },
+        
         fournisseur_1: {
             type: String
         },
@@ -69,7 +77,7 @@ const TenderNoticeSchema = new Schema(
         durée_fournisseur_2: {
             type: Number
         },
-        
+
         fournisseur_3: {
             type: String
         },
@@ -95,17 +103,18 @@ const TenderNotice = model("tenderNotice", TenderNoticeSchema);
 
 //intreractions with DB
 
-const addNewTenderNotice = async (source, object, description = null,
+const addNewTenderNotice = async (source, object, userId, description = null,
     missionHead = null, status = null, aoResponse = null, pvClient = null, cahierCharge = null,
     fournisseur_1 = null, prix_fournisseur_1 = null, durée_fournisseur_1 = null,
     fournisseur_2 = null, prix_fournisseur_2 = null, durée_fournisseur_2 = null,
-    fournisseur_3 = null, prix_fournisseur_3 = null, durée_fournisseur_3 = null,
+    fournisseur_3 = null, prix_fournisseur_3 = null, durée_fournisseur_3 = null, 
 ) => {
     if (!source || !object) {
         return false
     }
 
     const newTenderNotice = new TenderNotice({
+        userId,
         source,
         object,
         description,
