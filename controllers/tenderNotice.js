@@ -60,7 +60,7 @@ const deleteTenderNotice = async (req, res) => {
 };
 const updateTenderNotice = async (req, res) => {
     const { id } = req.params;
-    const { object, source, description, missionHead, status, aoResponse, pvClient, cahierCharge, commissionComments, controlleurDeGestionComments, controlleurDeGestionResponse, commissionResponse, directeurResponse, fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
+    const { object, source, description, missionHead, status, aoResponse, pvClient, cahierCharge, commissionComments, controlleurDeGestionComments, directeurComments,controlleurDeGestionResponse, commissionResponse, directeurResponse, fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
         fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
         fournisseur_3, prix_fournisseur_3, durée_fournisseur_3 } = req.body;
     try {
@@ -101,6 +101,9 @@ const updateTenderNotice = async (req, res) => {
 
         if (commissionComments) {
             updateObject["commissionComments"] = commissionComments;
+        }
+        if (directeurComments) {
+            updateObject["directeurComments"] = directeurComments;
         }
 
         if (controlleurDeGestionResponse) {
@@ -146,7 +149,7 @@ const updateTenderNotice = async (req, res) => {
             && !commissionResponse && !directeurResponse && !prix_fournisseur_3
             && !durée_fournisseur_3 && !fournisseur_3 && !prix_fournisseur_2
             && !durée_fournisseur_2 && !fournisseur_2 && !prix_fournisseur_1
-            && !durée_fournisseur_1 && !fournisseur_1
+            && !durée_fournisseur_1 && !fournisseur_1 && !directeurComments
 
 
         
