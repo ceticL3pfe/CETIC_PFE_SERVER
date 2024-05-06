@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { addNewTenderNotice, removeTenderNotice, updateTenderNoticeData, getTenderNoticeData } = require("../models/tenderNotice");
+const { addNewTenderNotice, removeTenderNotice, updateTenderNoticeData, getTenderNoticeData, getTenderNoticeArchive, getTenderNoticeDataArchive } = require("../models/tenderNotice");
 
 
 
@@ -60,7 +60,7 @@ const deleteTenderNotice = async (req, res) => {
 };
 const updateTenderNotice = async (req, res) => {
     const { id } = req.params;
-    const { object, source, description, missionHead, status, aoResponse, pvClient, cahierCharge, commissionComments, controlleurDeGestionComments, directeurComments,controlleurDeGestionResponse, commissionResponse, directeurResponse, fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
+    const { object, source, description, missionHead, status, aoResponse, pvClient, selectedFournisseur, cahierCharge, commissionComments, controlleurDeGestionComments, directeurComments,controlleurDeGestionResponse, commissionResponse, directeurResponse, fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
         fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
         fournisseur_3, prix_fournisseur_3, durée_fournisseur_3 } = req.body;
     try {
@@ -142,6 +142,9 @@ const updateTenderNotice = async (req, res) => {
         if (fournisseur_3) {
             updateObject["fournisseur_3"] = fournisseur_3;
         }
+        if (selectedFournisseur) {
+            updateObject["selectedFournisseur"] = selectedFournisseur;
+        }
 
         if (!object && !source && !description && !missionHead
             && !status && !cahierCharge && !pvClient && !aoResponse
@@ -149,7 +152,7 @@ const updateTenderNotice = async (req, res) => {
             && !commissionResponse && !directeurResponse && !prix_fournisseur_3
             && !durée_fournisseur_3 && !fournisseur_3 && !prix_fournisseur_2
             && !durée_fournisseur_2 && !fournisseur_2 && !prix_fournisseur_1
-            && !durée_fournisseur_1 && !fournisseur_1 && !directeurComments
+            && !durée_fournisseur_1 && !fournisseur_1 && !directeurComments && !selectedFournisseur
 
 
         
@@ -198,10 +201,30 @@ const getTenderNotices = async (req, res) => {
     }
 };
 
+const getTenderNoticesArchive = async (req, res) => {
+    try {
+
+        const response = await getTenderNoticeDataArchive();
+        if (!response) {
+            return res.status(500).json({ success: false, msg: "Failed to retrieve data" })
+        }
+
+        res.status(200).json({ success: true, msg: response })
+
+
+
+
+    } catch (error) {
+        console.error("Error retrieving files:", error);
+        res.status(500).json({ success: false, msg: "Internal server error" });
+    }
+};
+
 module.exports = {
     addTenderNotice,
     deleteTenderNotice,
     updateTenderNotice,
-    getTenderNotices
+    getTenderNotices,
+    getTenderNoticesArchive
 
 }

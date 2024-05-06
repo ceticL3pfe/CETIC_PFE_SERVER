@@ -88,6 +88,10 @@ const TenderNoticeSchema = new Schema(
         durée_fournisseur_3: {
             type: Number
         },
+        selectedFournisseur:{
+            type:String,
+        
+        }
 
 
 
@@ -188,57 +192,23 @@ const removeTenderNotice = async (tenderId) => {
 
 
 }
-
 const getTenderNoticeData = async () => {
-    const res = await TenderNotice.find()
-        .then(res => {
-            if (res) {
-                return res
-            } else {
-                // Document with the specified ID was not found
-                console.log("Document not found");
-                return false
-
-            }
-        })
-        .catch(error => {
-            // Error occurred while deleting the document
-            console.error("Error deleting document:", error);
-            return false
-
-        });
-
-
-    if (res) {
-        return res;
+    try {
+        const tenders = await TenderNotice.find({ status: { $nin: ["Closed", "Cancelled"] } });
+        return tenders;
+    } catch (error) {
+        console.error("Error retrieving tender notices:", error);
+        return false;
     }
-    return false
-
-
-
 }
-
-const getTenderNoticeArchive = async () => {
-    const res = await TenderNotice.find({
-        status: { $nin: ["Cancelled", "Closed"] }
-    })
-        .then(res => {
-            if (res) {
-                return res;
-            } else {
-                console.log("Document not found");
-                return false;
-            }
-        })
-        .catch(error => {
-            console.error("Error retrieving tender notices:", error);
-            return false;
-        });
-
-    if (res) {
-        return res;
+const getTenderNoticeDataArchive = async () => {
+    try {
+        const tenders = await TenderNotice.find({ status: { $in: ["Cancelled", "Closed"] } });
+        return tenders;
+    } catch (error) {
+        console.error("Error retrieving cancelled or closed tender notices:", error);
+        return false;
     }
-    return false;
 }
 
 
@@ -262,5 +232,5 @@ module.exports = {
     removeTenderNotice,
     updateTenderNoticeData,
     getTenderNoticeData,
-    getTenderNoticeArchive,
+    getTenderNoticeDataArchive,
 }
