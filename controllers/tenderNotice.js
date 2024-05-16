@@ -1,5 +1,6 @@
 const { ObjectId } = require("mongodb");
 const { addNewTenderNotice, removeTenderNotice, updateTenderNoticeData, getTenderNoticeData, getTenderNoticeArchive, getTenderNoticeDataArchive } = require("../models/tenderNotice");
+const { getActivities } = require("../models/activity");
 
 
 
@@ -9,11 +10,12 @@ const { addNewTenderNotice, removeTenderNotice, updateTenderNoticeData, getTende
 
 const addTenderNotice = async (req, res) => {
     try {
-        const {userId, source, object, description, status, missionHead, fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
+        const { username,userId, source, object, description,   fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
             fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
             fournisseur_3, prix_fournisseur_3, durée_fournisseur_3, } = req.body;
-
-        if (!object || !source || !userId) {
+        console.log(".///////////..................us", req.body, username)
+        if (!object || !source || !userId || !username) {
+            
             return res.status(401).json({ success: false, msg: "all fields are required" });
         }
 
@@ -22,7 +24,7 @@ const addTenderNotice = async (req, res) => {
 
 
 
-        const response = await addNewTenderNotice(source, object,userId ,description, missionHead, status,
+        const response = await addNewTenderNotice(username,source, object,userId ,description,  
             fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
             fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
             fournisseur_3, prix_fournisseur_3, durée_fournisseur_3, 
@@ -40,13 +42,16 @@ const addTenderNotice = async (req, res) => {
 
 const deleteTenderNotice = async (req, res) => {
     const { id } = req.params; // Assuming the file ID is passed in the request parameters
+   const {username} = req.body
+    console.log(".///.", username, req.body)
+
     try {
         // Check if id is a valid ObjectId
         if (!ObjectId.isValid(id)) {
             return res.status(400).json({ success: false, msg: "Invalid  ID " });
         }
 
-        const response = await removeTenderNotice(id);
+        const response = await removeTenderNotice(id, username);
 
         if (!response || response.nModified === 0) {
             return res.status(404).json({ success: false, msg: "File not deleted" });
@@ -60,9 +65,10 @@ const deleteTenderNotice = async (req, res) => {
 };
 const updateTenderNotice = async (req, res) => {
     const { id } = req.params;
-    const { object, source, description, missionHead, status, aoResponse, pvClient, selectedFournisseur, cahierCharge, commissionComments, controlleurDeGestionComments, directeurComments,controlleurDeGestionResponse, commissionResponse, directeurResponse, fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
+    const {username, object, source, description, missionHead, status, aoResponse, pvClient, selectedFournisseur, cahierCharge, commissionComments, controlleurDeGestionComments, directeurComments,controlleurDeGestionResponse, commissionResponse, directeurResponse, fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
         fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
         fournisseur_3, prix_fournisseur_3, durée_fournisseur_3 } = req.body;
+        console.log(".//.",username,req.body)
     try {
         if (!ObjectId.isValid(id)) {
             return res.status(400).json({ success: false, msg: "Invalid file ID" });
@@ -159,16 +165,15 @@ const updateTenderNotice = async (req, res) => {
         
         
         ) {
-            console.log(req.body)
 
             return res.status(400).json({ success: false, msg: "required fields" });
 
         }
 
         // Update the metadata of the file
-        const result = await updateTenderNoticeData(id, updateObject)
+        console.log("..........................",username)
+        const result = await updateTenderNoticeData(id, updateObject, username)
 
-        console.log(result)
 
         if (result) {
             return res.status(200).json({ success: true, msg: result });
@@ -200,7 +205,6 @@ const getTenderNotices = async (req, res) => {
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 };
-
 const getTenderNoticesArchive = async (req, res) => {
     try {
 
@@ -219,12 +223,33 @@ const getTenderNoticesArchive = async (req, res) => {
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 };
+ 
+const getTenderNoticesActivity = async (req, res) => {
+    try {
+
+        const response = await getActivities();
+        if (!response) {
+            return res.status(500).json({ success: false, msg: "Failed to retrieve data" })
+        }
+
+        res.status(200).json({ success: true, msg: response })
+
+
+
+
+    } catch (error) {
+        console.error("Error retrieving files:", error);
+        res.status(500).json({ success: false, msg: "Internal server error" });
+    }
+};
+ 
 
 module.exports = {
     addTenderNotice,
     deleteTenderNotice,
     updateTenderNotice,
     getTenderNotices,
-    getTenderNoticesArchive
+    getTenderNoticesArchive,
+    getTenderNoticesActivity
 
 }

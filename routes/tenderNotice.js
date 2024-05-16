@@ -5,7 +5,7 @@ const {
     addTenderNotice,
     updateTenderNotice,
     getTenderNotices,
-    getTenderNoticesArchive } = require('../controllers/tenderNotice')
+    getTenderNoticesArchive, getTenderNoticesActivity } = require('../controllers/tenderNotice')
 
 
 
@@ -15,6 +15,7 @@ const {
 
 router
     .get('/', getTenderNotices)
+    .get('/activity', getTenderNoticesActivity)
     .get('/archive', getTenderNoticesArchive)
     .delete('/:id', deleteTenderNotice)
     .post('/', addTenderNotice)

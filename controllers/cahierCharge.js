@@ -15,6 +15,8 @@ const addCahierCharge = async (req, res, bucket) => {
         console.log(req.file)
         const file = req.file;
         const tenderId = req.params.tenderId
+        const {username} = req.body
+        console.log(".///.", username, req.body)
 
         if (!file || !tenderId ) {
             console.log(req.body)
@@ -43,7 +45,7 @@ const addCahierCharge = async (req, res, bucket) => {
             // Assuming you're using AWS SDK to interact with S3
             const fileId = uploadStream.id; // This line may vary depending on your storage service
             console.log("fileID", uploadStream.id, fileId)
-            const response = await updateTenderNoticeData(tenderId, {cahierCharge:fileId});
+            const response = await updateTenderNoticeData(tenderId, {cahierCharge:fileId},username);
             if (!response) {
                 return res.status(500).json({ success: false, msg: "failed to add to db" });
             }
@@ -60,6 +62,8 @@ const addCahierCharge = async (req, res, bucket) => {
 
 const deleteCahierCharge = async (req, res, bucket) => {
     const { id, documentId } = req.params; // Assuming the file ID is passed in the request parameters
+const{username} = req.body
+    console.log(".///.", username, req.body)
 
     try {
         // Check if id is a valid ObjectId
@@ -80,7 +84,7 @@ const deleteCahierCharge = async (req, res, bucket) => {
         await bucket.delete(new ObjectId(id));
 
 
-        const response = await updateTenderNoticeData(documentId,{cahierCharge:null});
+        const response = await updateTenderNoticeData(documentId,{cahierCharge:null},username);
 
         if (!response || !response.isModified) {
             return res.status(404).json({ success: false, msg: "File not deleted" });

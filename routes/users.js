@@ -95,6 +95,22 @@ router.put("/password", async (req, res) => {
 
 })
 
+router.delete("/", async (req, res) => {
+  const { id } = req.body;
+
+
+  const rep = deleteUser(id)
+  if (!rep) {
+    return res.status(501).json({ success: false, msg: "failed to delete user" })
+
+  }
+
+
+
+  res.status(200).json({ success: true, msg: "user deleted successfully" })
+
+})
+
 
 
 

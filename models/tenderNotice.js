@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const { addActivity } = require("./activity");
 
 const TenderNoticeSchema = new Schema(
     {
@@ -22,9 +23,12 @@ const TenderNoticeSchema = new Schema(
         },
         status: {
             type: String,
-            default: "Pending",
-            enum: ["Pending", "analyse de la commission", "validation retrait cdc",
-                "validation dossier de reponse", "Open", "Closed", "Cancelled"]
+            default: "validation de retrait de cdc",
+            enum: ["Annuler", "Terminer",
+                "validation de retrait de cdc",
+                "analyse de la commission",
+                "analyse de contolleur de gestion",
+                "validation de directeur",]
         },
         aoResponse: {
             type: String,
@@ -51,11 +55,11 @@ const TenderNoticeSchema = new Schema(
         controlleurDeGestionResponse: {
             type: String
         },
-        
+
         directeurResponse: {
             type: String
         },
-        
+
         fournisseur_1: {
             type: String
         },
@@ -88,9 +92,9 @@ const TenderNoticeSchema = new Schema(
         durée_fournisseur_3: {
             type: Number
         },
-        selectedFournisseur:{
-            type:String,
-        
+        selectedFournisseur: {
+            type: String,
+
         }
 
 
@@ -107,11 +111,11 @@ const TenderNotice = model("tenderNotice", TenderNoticeSchema);
 
 //intreractions with DB
 
-const addNewTenderNotice = async (source, object, userId, description = null,
-    missionHead = null, status = null, aoResponse = null, pvClient = null, cahierCharge = null,
+const addNewTenderNotice = async (username,source, object, userId, description = null,
+    missionHead = null,  aoResponse = null, pvClient = null, cahierCharge = null,
     fournisseur_1 = null, prix_fournisseur_1 = null, durée_fournisseur_1 = null,
     fournisseur_2 = null, prix_fournisseur_2 = null, durée_fournisseur_2 = null,
-    fournisseur_3 = null, prix_fournisseur_3 = null, durée_fournisseur_3 = null, 
+    fournisseur_3 = null, prix_fournisseur_3 = null, durée_fournisseur_3 = null,
 ) => {
     if (!source || !object) {
         return false
@@ -123,7 +127,6 @@ const addNewTenderNotice = async (source, object, userId, description = null,
         object,
         description,
         missionHead,
-        status,
         aoResponse
         , pvClient,
         cahierCharge,
@@ -133,19 +136,25 @@ const addNewTenderNotice = async (source, object, userId, description = null,
     })
 
 
-    const res = await newTenderNotice.save().then((res) => {
+    const res = await newTenderNotice.save().then(async(res) => {
         console.log("added successfully")
+       await addActivity(username, `added a new Tender ${object} `)
+
         return res
     }).catch(err => {
         console.log("error while adding tender notice to db", err)
         return false
     })
 
+
+
+
     return res
 }
 
-const updateTenderNoticeData = async (tenderId, updateData) => {
+const updateTenderNoticeData = async (tenderId, updateData,username) => {
     try {
+        console.log("///////////",username)
         const updatedTender = await TenderNotice.findOneAndUpdate(
             { _id: tenderId },
             updateData,
@@ -154,6 +163,8 @@ const updateTenderNoticeData = async (tenderId, updateData) => {
 
         if (updatedTender) {
             console.log('Updated successfully:', updatedTender);
+            await addActivity(username, `Updated  Tender ${tenderId} `)
+
             return updatedTender;
         } else {
             console.log('No document updated');
@@ -165,7 +176,7 @@ const updateTenderNoticeData = async (tenderId, updateData) => {
     }
 };
 
-const removeTenderNotice = async (tenderId) => {
+const removeTenderNotice = async (tenderId,username) => {
     console.log("asdasdasdas")
 
     const res = await TenderNotice.findByIdAndDelete(tenderId)
@@ -187,6 +198,9 @@ const removeTenderNotice = async (tenderId) => {
 
         });
 
+    await addActivity(username, `deleted a Tender ${tenderId} `)
+
+
     return res
 
 
@@ -194,7 +208,7 @@ const removeTenderNotice = async (tenderId) => {
 }
 const getTenderNoticeData = async () => {
     try {
-        const tenders = await TenderNotice.find({ status: { $nin: ["Closed", "Cancelled"] } });
+        const tenders = await TenderNotice.find({ status: { $nin: ["Terminer", "Annuler"] } });
         return tenders;
     } catch (error) {
         console.error("Error retrieving tender notices:", error);
@@ -203,7 +217,7 @@ const getTenderNoticeData = async () => {
 }
 const getTenderNoticeDataArchive = async () => {
     try {
-        const tenders = await TenderNotice.find({ status: { $in: ["Cancelled", "Closed"] } });
+        const tenders = await TenderNotice.find({ status: { $in: ["Terminer", "Annuler"] } });
         return tenders;
     } catch (error) {
         console.error("Error retrieving cancelled or closed tender notices:", error);

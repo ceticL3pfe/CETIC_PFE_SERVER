@@ -13,8 +13,9 @@ const addClientPv = async (req, res, bucket) => {
         console.log(req.file)
         const file = req.file;
         const tenderId = req.params.tenderId
-
-        if (!file || !tenderId) {
+const {username} = req.body
+console.log(".///.",username,req.body)
+        if (!file || !tenderId || !username) {
             console.log(req.body)
             return res.status(401).json({ success: false, msg: "all fields are required" });
         }
@@ -41,7 +42,7 @@ const addClientPv = async (req, res, bucket) => {
             // Assuming you're using AWS SDK to interact with S3
             const fileId = uploadStream.id; // This line may vary depending on your storage service
             console.log("fileID", uploadStream.id, fileId)
-            const response = await updateTenderNoticeData(tenderId, { pvClient: fileId });
+            const response = await updateTenderNoticeData(tenderId, { pvClient: fileId },username);
             if (!response) {
                 return res.status(500).json({ success: false, msg: "failed to add to db" });
             }
@@ -58,7 +59,7 @@ const addClientPv = async (req, res, bucket) => {
 
 const deleteClientPv = async (req, res, bucket) => {
     const { id, documentId } = req.params; // Assuming the file ID is passed in the request parameters
-
+const {username} = req.body
     try {
         // Check if id is a valid ObjectId
         if (!ObjectId.isValid(id) || !ObjectId.isValid(documentId)) {
@@ -78,7 +79,7 @@ const deleteClientPv = async (req, res, bucket) => {
         await bucket.delete(new ObjectId(id));
 
 
-        const response = await updateTenderNoticeData(documentId, { pvClient: null });
+        const response = await updateTenderNoticeData(documentId, { pvClient: null }, username);
 
         if (!response || !response.isModified) {
             return res.status(404).json({ success: false, msg: "File not deleted" });

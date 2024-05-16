@@ -56,9 +56,34 @@ const editPassword = async (password, email) => {
   }
 };
 
+
+const deleteUser =async (id)=>{
+
+  try {
+    const user = await User.findOneAndDelete({_id:id})
+
+    if (!user) {
+      console.log("User not found");
+      return false;
+    }
+
+    console.log("user deleted successfully");
+    return true;
+  } catch (error) {
+    console.error("Error updating password:", error);
+    return false;
+  }
+
+
+  
+
+
+
+}
+
 module.exports = {
   User,
-
+  deleteUser,
   editPassword
 }
 
