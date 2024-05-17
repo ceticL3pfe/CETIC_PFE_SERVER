@@ -14,7 +14,7 @@ const {
   serializeUser
 } = require("../utils/Auth");
 
-const { getUsers, activateUsers, addMission, deleteUser, editPassword } = require("../models/User");
+const { getUsers, activateUsers, addMission, deleteUser, editPassword, User } = require("../models/User");
 const { sendVerificationEmail, verifyEmailToken } = require('../config/email');
 
 
@@ -75,23 +75,26 @@ router.post("/password", async (req, res) => {
   res.status(200).json({ success: true, msg: "a code was sent to your email" })
 })
 
-router.put("/password", async (req, res) => {
-  const { token, password,email } = req.body;
-
-
-  const rep =  verifyEmailToken(token)
-  if (!rep) {
-    return res.status(501).json({ success: false, msg: "failed to verify token" })
-
+router.put("/:userId", async (req, res) => {
+  let respons
+  const userId = req.params.userId;
+  const { username, email, password, image } = req.body;
+  console.log(req.body,"//")
+  if (!userId) {
+    return res.status(500).send("userId to delete is required")
   }
-  const newPassword = await bcrypt.hash(password, 12);
-  const response = await editPassword(newPassword, email)
-  if (!response) {
-    return res.status(502).json({ success: false, msg: "failed to update password" })
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 12);
 
+    respons = await User.findByIdAndUpdate(userId, { password: hashedPassword });
+    console.log(respons)
   }
-
-  res.status(200).json({ success: true, msg: "user updated successfully" })
+  // console.log(respons)
+  if (!respons) {
+    return res.status(500).json({ success: false, message: "error while updating user" })
+  }
+  // console.log(respons)
+  res.status(200).json({ success: true, message: 'password updated successfully' })
 
 })
 
