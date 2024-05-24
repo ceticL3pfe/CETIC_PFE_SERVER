@@ -75,6 +75,34 @@ router.post("/password", async (req, res) => {
   res.status(200).json({ success: true, msg: "a code was sent to your email" })
 })
 
+router.put("/password", async (req, res) => {
+  let respons
+  const {  password ,code,email} = req.body;
+  console.log(req.body, "//")
+
+  if(!verifyEmailToken(code)){
+    return res.status(501).send("code is incorrect")
+
+  }
+  if (!email) {
+    return res.status(500).send("userId to delete is required")
+  }
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    respons = await User.updateOne({email:email}, { password: hashedPassword });
+    console.log(respons)
+  }
+  // console.log(respons)
+  if (!respons) {
+    return res.status(500).json({ success: false, message: "error while updating user" })
+  }
+  // console.log(respons)
+  res.status(200).json({ success: true, message: 'password updated successfully' })
+
+})
+
+
 router.put("/:userId", async (req, res) => {
   let respons
   const userId = req.params.userId;

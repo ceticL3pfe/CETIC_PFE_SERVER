@@ -111,16 +111,18 @@ const TenderNotice = model("tenderNotice", TenderNoticeSchema);
 
 //intreractions with DB
 
-const addNewTenderNotice = async (username,source, object, userId, description = null,
+const addNewTenderNotice = async ({username,source, object, userId, description = null,
     missionHead = null,  aoResponse = null, pvClient = null, cahierCharge = null,
     fournisseur_1 = null, prix_fournisseur_1 = null, durée_fournisseur_1 = null,
     fournisseur_2 = null, prix_fournisseur_2 = null, durée_fournisseur_2 = null,
-    fournisseur_3 = null, prix_fournisseur_3 = null, durée_fournisseur_3 = null,
+    fournisseur_3 = null, prix_fournisseur_3 = null, durée_fournisseur_3 = null},
 ) => {
     if (!source || !object) {
         return false
     }
-
+    console.log(fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
+        fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
+        fournisseur_3, prix_fournisseur_3, durée_fournisseur_3,)
     const newTenderNotice = new TenderNotice({
         userId,
         source,

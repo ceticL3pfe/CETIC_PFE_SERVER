@@ -22,12 +22,14 @@ const addTenderNotice = async (req, res) => {
 
 
 
+        console.log(fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
+            fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
+            fournisseur_3, prix_fournisseur_3, durée_fournisseur_3,)
 
-
-        const response = await addNewTenderNotice(username,source, object,userId ,description,  
+        const response = await addNewTenderNotice({username,source, object,userId ,description,  
             fournisseur_1, prix_fournisseur_1, durée_fournisseur_1,
             fournisseur_2, prix_fournisseur_2, durée_fournisseur_2,
-            fournisseur_3, prix_fournisseur_3, durée_fournisseur_3, 
+            fournisseur_3, prix_fournisseur_3, durée_fournisseur_3, }
         );
         if (!response) {
             return res.status(500).json({ success: false, msg: "failed to add to db" });
