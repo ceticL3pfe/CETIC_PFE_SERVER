@@ -208,6 +208,37 @@ const removeTenderNotice = async (tenderId,username) => {
 
 
 }
+
+const removeTenderNoticeFromArchive = async (tenderId,username) => {
+    console.log("asdasdasdas")
+
+    const res = await TenderNotice.findByIdAndDelete(tenderId)
+        .then(deletedDocument => {
+            if (deletedDocument) {
+                // Document was found and deleted successfully
+                return deletedDocument
+            } else {
+                // Document with the specified ID was not found
+                console.log("Document not found or not deleted");
+                return false
+
+            }
+        })
+        .catch(error => {
+            // Error occurred while deleting the document
+            console.error("Error deleting document:", error);
+            return false
+
+        });
+
+    await addActivity(username, `deleted a Tender from archive ${tenderId} `)
+
+
+    return res
+
+
+
+}
 const getTenderNoticeData = async () => {
     try {
         const tenders = await TenderNotice.find({ status: { $nin: ["Terminer", "Annuler"] } });
@@ -244,6 +275,7 @@ const serializeTenderNotice = (data) => {
 
 module.exports = {
     TenderNotice,
+    removeTenderNoticeFromArchive,
     addNewTenderNotice,
     removeTenderNotice,
     updateTenderNoticeData,

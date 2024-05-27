@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { addNewTenderNotice, removeTenderNotice, updateTenderNoticeData, getTenderNoticeData, getTenderNoticeArchive, getTenderNoticeDataArchive } = require("../models/tenderNotice");
+const { addNewTenderNotice, removeTenderNotice, updateTenderNoticeData, getTenderNoticeData, getTenderNoticeArchive, getTenderNoticeDataArchive, removeTenderNoticeFromArchive } = require("../models/tenderNotice");
 const { getActivities } = require("../models/activity");
 
 
@@ -225,6 +225,30 @@ const getTenderNoticesArchive = async (req, res) => {
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 };
+
+const deleteTenderNoticesArchive = async (req, res) => {
+    const { id } = req.params; // Assuming the file ID is passed in the request parameters
+    const { username } = req.body
+    console.log(".///.", username, req.body)
+
+    try {
+        // Check if id is a valid ObjectId
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, msg: "Invalid  ID " });
+        }
+
+        const response = await removeTenderNoticeFromArchive(id, username);
+
+        if (!response || response.nModified === 0) {
+            return res.status(404).json({ success: false, msg: "File not deleted" });
+
+        }
+        return res.status(200).json({ success: true, msg: "File deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting file:", error);
+        res.status(500).json({ success: false, msg: "Internal server error" });
+    }
+};
  
 const getTenderNoticesActivity = async (req, res) => {
     try {
@@ -252,6 +276,7 @@ module.exports = {
     updateTenderNotice,
     getTenderNotices,
     getTenderNoticesArchive,
-    getTenderNoticesActivity
+    getTenderNoticesActivity,
+    deleteTenderNoticesArchive
 
 }
