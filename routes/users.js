@@ -23,10 +23,6 @@ router.post("/register-admin", async (req, res) => {
   await userRegister(req.body, "admin", res);
 });
 
-// Super Admin Registration Route
-router.post("/register-super-admin", async (req, res) => {
-  await userRegister(req.body, "superadmin", res);
-});
 
 // Users Login Route
 router.post("/login", async (req, res) => {
@@ -129,79 +125,15 @@ router.put("/:userId", async (req, res) => {
 router.delete("/", async (req, res) => {
   const { id } = req.body;
 
-
   const rep = deleteUser(id)
   if (!rep) {
     return res.status(501).json({ success: false, msg: "failed to delete user" })
 
   }
 
-
-
   res.status(200).json({ success: true, msg: "user deleted successfully" })
 
 })
 
-
-
-
-
-
-
-
-// // Admin Login Route
-// router.post("/login-manager", async (req, res) => {
-//   await userLogin(req.body, "manager", res);
-// });
-
-// // Super Admin Login Route
-// router.post("/login-super-admin", async (req, res) => {
-//   await userLogin(req.body, "superadmin", res);
-// });
-
-// // Profile Route
-// router.get("/profile", userAuth, async (req, res) => {
-//   return res.json(serializeUser(req.user));
-// });
-
-// Users Protected Route
-router.get(
-  "/user-protectd",
-  userAuth,
-  checkRole(["user", "superadmin"]),
-  async (req, res) => {
-    return res.json("Hello User");
-  }
-);
-
-// Admin Protected Route
-router.get(
-  "/admin-protectd",
-  userAuth,
-  checkRole(["admin", "superadmin"]),
-  async (req, res) => {
-    return res.json("Hello Admin");
-  }
-);
-
-// Super Admin Protected Route
-router.get(
-  "/super-admin-protectd",
-  userAuth,
-  checkRole(["superadmin"]),
-  async (req, res) => {
-    return res.json("Hello Super Admin");
-  }
-);
-
-// Super Admin Protected Route
-router.get(
-  "/super-admin-and-admin-protectd",
-  userAuth,
-  checkRole(["superadmin", "admin"]),
-  async (req, res) => {
-    return res.json("Super admin and Admin");
-  }
-);
 
 module.exports = router;

@@ -12,7 +12,6 @@ const {
 
 
 
-
 router
     .get('/', getTenderNotices)
     .get('/activity', getTenderNoticesActivity)

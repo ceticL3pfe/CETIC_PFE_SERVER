@@ -20,14 +20,14 @@ require("./middlewares/passport")(passport);
 
 app.use("/user", require("./routes/users"));
 app.use("/admin", require('./routes/admin'))
-app.use("/tenderNotice", require("./routes/tenderNotice"));
-app.use("/client", require("./routes/client"));
-app.use("/fournisseur", require("./routes/fournisseur"));
-app.use("/cdc", require("./routes/cahierCharge"));
-app.use("/aoReponse", require("./routes/aoReponse"));
-app.use("/pvClient", require("./routes/clientPv"));
+app.use("/tenderNotice", userAuth,require("./routes/tenderNotice"));
+app.use("/client", userAuth, require("./routes/client"));
+app.use("/fournisseur", userAuth, require("./routes/fournisseur"));
+app.use("/cdc", userAuth, require("./routes/cahierCharge"));
+app.use("/aoReponse", userAuth, require("./routes/aoReponse"));
+app.use("/pvClient", userAuth, require("./routes/clientPv"));
 
-app.use("/*", (req, res) => res.render('index'))
+app.use("/*", (req, res) => res.send("<h1>404 not found</h1>"))
 
 
 
